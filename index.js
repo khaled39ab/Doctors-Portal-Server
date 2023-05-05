@@ -26,11 +26,27 @@ async function run() {
     try {
 
         const appointmentCollection = client.db("doctors-portal").collection("AvailableAppointment");
+        const bookingsCollection = client.db("doctors-portal").collection("Bookings");
 
         app.get('/availableAppointment', async(req, res) =>{
             const query = {};
             const result = await appointmentCollection.find(query).toArray();
             res.send(result)
+        });
+
+
+
+        app.get('/bookings', async(req, res) =>{
+            const query = {};
+            const result = await bookingsCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        app.post('/bookings', async(req, res) =>{
+            const booking = req.body;
+            console.log(booking);
+            const result = bookingsCollection.insertOne(booking);
+            res.send(result);
         });
 
     }
