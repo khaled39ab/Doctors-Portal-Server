@@ -29,6 +29,9 @@ async function run() {
         const bookingsCollection = client.db("doctors-portal").collection("Bookings");
 
         app.get('/availableAppointment', async(req, res) =>{
+            const date = req.query.date;
+            console.log(date);
+            
             const query = {};
             const result = await appointmentCollection.find(query).toArray();
             res.send(result)
