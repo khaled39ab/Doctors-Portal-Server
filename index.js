@@ -30,11 +30,20 @@ async function run() {
 
         app.get('/availableAppointment', async(req, res) =>{
             const date = req.query.date;
-            console.log(date);
-            
             const query = {};
-            const result = await appointmentCollection.find(query).toArray();
-            res.send(result)
+            const options = await appointmentCollection.find(query).toArray();
+
+            const bookingQuery = {appointmentDate: date}
+            const bookedDate = await bookingsCollection.find.apply(bookingQuery).toArray();
+            
+            options.forEach(option => {
+                const optionBooked = bookedDate.filter(booked =>{
+                    booked.treatment == option.name
+                })
+                console.log(optionBooked);
+            })
+
+            res.send(options)
         });
 
 
