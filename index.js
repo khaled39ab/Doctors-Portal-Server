@@ -28,33 +28,39 @@ async function run() {
         const appointmentCollection = client.db("doctors-portal").collection("AvailableAppointment");
         const bookingsCollection = client.db("doctors-portal").collection("Bookings");
 
-        app.get('/availableAppointment', async(req, res) =>{
+
+        app.get('/availableAppointment', async (req, res) => {
             const date = req.query.date;
             const query = {};
             const options = await appointmentCollection.find(query).toArray();
 
-            const bookingQuery = {appointmentDate: date}
-            const bookedDate = await bookingsCollection.find.apply(bookingQuery).toArray();
-            
-            options.forEach(option => {
-                const optionBooked = bookedDate.filter(booked =>{
-                    booked.treatment == option.name
-                })
-                console.log(optionBooked);
-            })
+            const bookingQuery = { appointmentDate: date }
+            // const bookedDate = await bookingsCollection.find.apply(bookingQuery).toArray();
+
+            // options.forEach(option => {
+            // const optionBooked = bookedDate.filter(booked => booked.treatment === option.name)
+            // console.log(optionBooked);
+            // })
 
             res.send(options)
         });
 
 
+        app.get('available', async (req, res) => {
+            const date = req.query.date;
+            const query = { date: date };
+            const options = await appointmentCollection.find(query).toArray();
+        })
 
-        app.get('/bookings', async(req, res) =>{
+
+
+        app.get('/bookings', async (req, res) => {
             const query = {};
             const result = await bookingsCollection.find(query).toArray();
             res.send(result);
         });
 
-        app.post('/bookings', async(req, res) =>{
+        app.post('/bookings', async (req, res) => {
             const booking = req.body;
             console.log(booking);
             const result = bookingsCollection.insertOne(booking);
