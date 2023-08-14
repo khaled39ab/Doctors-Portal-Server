@@ -35,23 +35,19 @@ async function run() {
             const options = await appointmentCollection.find(query).toArray();
 
             const bookingQuery = { appointmentDate: date }
-            // const bookedDate = await bookingsCollection.find.apply(bookingQuery).toArray();
+            const bookedDate = await bookingsCollection.find(bookingQuery).toArray();
 
-            // options.forEach(option => {
-            // const optionBooked = bookedDate.filter(booked => booked.treatment === option.name)
-            // console.log(optionBooked);
-            // })
+            options.forEach(option => {
+                const optionBooked = bookedDate.filter(booked => booked.treatment === option.name)
+                // console.log(optionBooked);
+                const bookedSlots = optionBooked.map(book => book.slot);
+                const remainingSlots = option.slots.filter(slot => !bookedSlots.includes(slot))
+                option.slots = remainingSlots;
+
+            })
 
             res.send(options)
         });
-
-
-        app.get('available', async (req, res) => {
-            const date = req.query.date;
-            const query = { date: date };
-            const options = await appointmentCollection.find(query).toArray();
-        })
-
 
 
         app.get('/bookings', async (req, res) => {
@@ -62,7 +58,7 @@ async function run() {
 
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
-            console.log(booking);
+            // console.log(booking);
             const result = bookingsCollection.insertOne(booking);
             res.send(result);
         });
