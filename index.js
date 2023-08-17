@@ -62,17 +62,23 @@ async function run() {
             const query = {
                 appointmentDate: booking.appointmentDate,
                 email: booking.email,
-                treatment: booking.treatment 
+                treatment: booking.treatment
             }
 
-            const alreadyBooked = await bookingsCollection.find(query).toArray();
-
-            if (alreadyBooked.length){
+            /* const alreadyBooked = await bookingsCollection.find(query).toArray();
+            console.log(alreadyBooked);
+            if (alreadyBooked.length) {
                 const message = `You already have a booking on ${booking.appointmentDate}`
-                return res.send({acknowledged: false, message})
+                return res.send({ acknowledged: false, message })
+            } */
+
+            const alreadyBooked = await bookingsCollection.findOne(query);
+            if (alreadyBooked) {
+                res.send({ success: false, booking: alreadyBooked })
             }
+
             const result = bookingsCollection.insertOne(booking);
-            res.send(result);
+            res.send( result );
         });
 
     }
