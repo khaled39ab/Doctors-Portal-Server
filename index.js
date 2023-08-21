@@ -33,13 +33,13 @@ async function run() {
             const date = req.query.date;
             const query = {};
             const options = await appointmentCollection.find(query).toArray();
-            
+
             const bookingQuery = { appointmentDate: date }
             const bookedDate = await bookingsCollection.find(bookingQuery).toArray();
 
             options.forEach(option => {
                 const optionBooked = bookedDate.filter(booked => booked.treatment === option.name)
-                
+
                 const bookedSlots = optionBooked.map(book => book.period);
                 const remainingSlots = option.slots.filter(slot => !bookedSlots.includes(slot))
                 option.slots = remainingSlots;
@@ -50,7 +50,8 @@ async function run() {
 
 
         app.get('/bookings', async (req, res) => {
-            const query = {};
+            const email = req.query.email;
+            const query = { email: email };          
             const result = await bookingsCollection.find(query).toArray();
             res.send(result);
         });
@@ -77,7 +78,7 @@ async function run() {
             }
 
             const result = bookingsCollection.insertOne(booking);
-            res.send( {success: true, result} );
+            res.send({ success: true, result });
         });
 
     }
