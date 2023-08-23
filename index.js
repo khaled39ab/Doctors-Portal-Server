@@ -27,6 +27,8 @@ async function run() {
 
         const appointmentCollection = client.db("doctors-portal").collection("AvailableAppointment");
         const bookingsCollection = client.db("doctors-portal").collection("Bookings");
+        const usersCollection = client.db("doctors-portal").collection("users");
+
 
 
         app.get('/availableAppointment', async (req, res) => {
@@ -49,28 +51,40 @@ async function run() {
         });
 
 
+
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: user
+            };
+
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
+
+
+
         app.get('/bookings', async (req, res) => {
             const email = req.query.email;
-            const query = { email: email };          
+            const query = { email: email };
             const result = await bookingsCollection.find(query).toArray();
             res.send(result);
         });
 
+
+
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
-            // console.log(booking);
+
             const query = {
                 appointmentDate: booking.appointmentDate,
                 email: booking.email,
                 treatment: booking.treatment
             }
-
-            /* const alreadyBooked = await bookingsCollection.find(query).toArray();
-            console.log(alreadyBooked);
-            if (alreadyBooked.length) {
-                const message = `You already have a booking on ${booking.appointmentDate}`
-                return res.send({ acknowledged: false, message })
-            } */
 
             const alreadyBooked = await bookingsCollection.findOne(query);
             if (alreadyBooked) {
@@ -81,7 +95,9 @@ async function run() {
             res.send({ success: true, result });
         });
 
+
     }
+
     finally {
         // await client.close();
     }
