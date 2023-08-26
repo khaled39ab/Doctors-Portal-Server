@@ -53,9 +53,24 @@ async function run() {
 
 
 
+        app.get('/users', async (req, res) => {
+            const query = { };
+            const result = await usersCollection.find(query).toArray();
+            res.send(result);
+        });
+
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user)
+            res.send(result);
+        });
+
+
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
+
             const filter = { email: email };
             const options = { upsert: true };
 
