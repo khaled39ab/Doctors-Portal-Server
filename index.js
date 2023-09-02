@@ -78,8 +78,7 @@ async function run() {
 
 
         app.get('/users', async (req, res) => {
-            const query = {};
-            const result = await usersCollection.find(query).toArray();
+            const result = await usersCollection.find().toArray();
             res.send(result);
         });
 
@@ -114,7 +113,7 @@ async function run() {
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
             const decodedEmail = req?.decoded?.email;
-            
+
             if (email === decodedEmail) {
                 const query = { email: email };
                 const result = await bookingsCollection.find(query).toArray();
