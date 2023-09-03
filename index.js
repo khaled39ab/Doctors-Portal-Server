@@ -28,7 +28,7 @@ const client = new MongoClient(uri, {
 
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
-    // console.log(authHeader);
+    
     if (!authHeader) {
         return res.status(401).send({ message: 'unauthorized access' })
     };
@@ -103,7 +103,7 @@ async function run() {
             };
 
             const result = await usersCollection.updateOne(filter, updateDoc, options);
-            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '10h' })
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN)
 
             res.send({ result, token });
         });
