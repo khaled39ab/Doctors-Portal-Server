@@ -28,7 +28,7 @@ const client = new MongoClient(uri, {
 
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader) {
         return res.status(401).send({ message: 'unauthorized access' })
     };
@@ -110,16 +110,25 @@ async function run() {
 
 
 
-        app.put('/user/admin/:email',verifyJWT, async (req, res) => {
+        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
-            console.log(email);
-            const updateDoc = {
-                $set: { role: 'admin' }
-            };
 
-            const result = await usersCollection.updateOne(filter, updateDoc);
-            res.send(result);
+            const requester = req.decoded.email;
+            const requesterAccount = await usersCollection.findOne({ email: requester })
+
+            if (requesterAccount.role === 'admin') {
+                const updateDoc = {
+                    $set: { role: 'admin' }
+                };
+
+                const result = await usersCollection.updateOne(filter, updateDoc);
+                res.send(result);
+            }
+            else {
+                res.status(403).send({ message: 'forbidden' })
+            }
+            
         });
 
 
