@@ -77,6 +77,14 @@ async function run() {
 
 
 
+        app.get('/specialty', async (req, res) => {
+            const query = {}
+            const result = await appointmentCollection.find(query).project({name: 1}).toArray();
+            res.send(result);
+        });
+        
+
+
         app.get('/users', verifyJWT, async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
