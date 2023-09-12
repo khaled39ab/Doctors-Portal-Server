@@ -53,9 +53,10 @@ async function run() {
         const appointmentCollection = client.db("doctors-portal").collection("AvailableAppointment");
         const bookingsCollection = client.db("doctors-portal").collection("Bookings");
         const usersCollection = client.db("doctors-portal").collection("users");
+        const doctorsCollection = client.db("doctors-portal").collection("doctors");
 
 
-
+        /* ========================================================================================================== */
         app.get('/availableAppointment', async (req, res) => {
             const date = req.query.date;
             const query = {};
@@ -78,12 +79,24 @@ async function run() {
 
 
         app.get('/specialty', async (req, res) => {
-            const query = {}
-            const result = await appointmentCollection.find(query).project({name: 1}).toArray();
+            const result = await appointmentCollection.find().project({ name: 1 }).toArray();
             res.send(result);
         });
-        
 
+
+        /* ========================================================================================================== */
+        app.get('/doctors', verifyJWT, async (req, res) => {
+            const doctors = await doctorsCollection.find().toArray();
+            res.send(doctors);
+        });
+
+
+        app.post('/doctors',verifyJWT, async (req, res) => {
+
+        });
+
+
+        /* ========================================================================================================== */
 
         app.get('/users', verifyJWT, async (req, res) => {
             const result = await usersCollection.find().toArray();
@@ -117,14 +130,14 @@ async function run() {
         });
 
 
-
+        /* ========================================================================================================== */
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
             const user = await usersCollection.findOne({ email: email })
             const isAdmin = user.role === 'admin';
             res.send({ admin: isAdmin })
         });
-        
+
 
 
         app.put('/user/admin/:email', verifyJWT, async (req, res) => {
@@ -150,7 +163,7 @@ async function run() {
 
 
 
-
+        /* ========================================================================================================== */
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
             const decodedEmail = req?.decoded?.email;
