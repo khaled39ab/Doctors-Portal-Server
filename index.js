@@ -53,7 +53,7 @@ async function run() {
         const appointmentCollection = client.db("doctors-portal").collection("AvailableAppointment");
         const bookingsCollection = client.db("doctors-portal").collection("Bookings");
         const usersCollection = client.db("doctors-portal").collection("users");
-        const doctorsCollection = client.db("doctors-portal").collection("doctors");
+        const doctorsCollection = client.db("doctors-portal").collection("Doctors");
 
 
         /* ========================================================================================================== */
@@ -91,8 +91,18 @@ async function run() {
         });
 
 
-        app.post('/doctors',verifyJWT, async (req, res) => {
+        app.post('/doctors', verifyJWT, async (req, res) => {
+            const doctor = req.body;
+            const result = await doctorsCollection.insertOne(doctor);
+            res.send(result)
+        });
 
+
+        app.delete('/doctors/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email }
+            const result = await doctorsCollection.deleteOne(filter);
+            res.send(result);
         });
 
 
