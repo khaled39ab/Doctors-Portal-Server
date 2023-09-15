@@ -105,7 +105,7 @@ async function run() {
         });
 
 
-        app.post('/doctors', verifyJWT, async (req, res) => {
+        app.post('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
             const doctor = req.body;
             const result = await doctorsCollection.insertOne(doctor);
             res.send(result)
@@ -168,17 +168,12 @@ async function run() {
             const email = req.params.email;
             const filter = { email: email };
 
-            // const requester = req.decoded.email;
-            // const requesterAccount = await usersCollection.findOne({ email: requester })
+            const updateDoc = {
+                $set: { role: 'admin' }
+            };
 
-            // if (requesterAccount.role === 'admin') {
-                const updateDoc = {
-                    $set: { role: 'admin' }
-                };
-
-                const result = await usersCollection.updateOne(filter, updateDoc);
-                res.send(result);
-            // }
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.send(result);
 
         });
 
