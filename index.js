@@ -195,11 +195,9 @@ async function run() {
 
 
 
-        app.get('/booking/:id', async(req,res)=>{
+        app.get('/bookings/:id', verifyJWT, async(req,res)=>{
             const id = req.params.id;
-            // console.log(id);
-            const query = {_id: ObjectId(id)}
-            // console.log(query);
+            const query = {_id: new ObjectId(id)}
             const booking = await bookingsCollection.findOne(query)
             res.send(booking)
         });
