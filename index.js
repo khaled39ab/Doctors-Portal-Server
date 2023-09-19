@@ -195,9 +195,9 @@ async function run() {
 
 
 
-        app.get('/bookings/:id', verifyJWT, async(req,res)=>{
+        app.get('/bookings/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const booking = await bookingsCollection.findOne(query)
             res.send(booking)
         });
@@ -222,6 +222,22 @@ async function run() {
             res.send({ success: true, result });
         });
 
+
+
+        /* ========================================================================================================== */
+        app.post('create-payment-intent', async (req, res) => {
+            const service = req.body;
+            const price = service.price;
+            const amount = price * 100;
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: "usd",
+                payment_method_types: ["card"],
+            });
+
+            res.send({ clientSecret: paymentIntent.client_secret });
+        });
+        
     }
 
     finally {
