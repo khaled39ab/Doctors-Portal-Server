@@ -203,7 +203,7 @@ async function run() {
             const booking = await bookingsCollection.findOne(query)
             res.send(booking)
         });
-        
+
 
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
@@ -218,13 +218,13 @@ async function run() {
             if (alreadyBooked) {
                 res.send({ success: false, booking: alreadyBooked })
             }
-            
+
             const result = bookingsCollection.insertOne(booking);
             res.send({ success: true, result });
         });
-        
-        
-        
+
+
+
         app.patch('/bookings/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
@@ -245,14 +245,14 @@ async function run() {
 
 
 
-        
+
         /* ========================================================================================================== */
-        app.get('/all-payment', async(req, res)=>{
+        app.get('/all-payment', verifyJWT, async (req, res) => {
             const result = await paymentCollection.find().toArray();
             res.send(result);
-        })
+        });
 
-        
+
         /* ========================================================================================================== */
         app.post('/create-payment-intent', async (req, res) => {
             const service = req.body;
