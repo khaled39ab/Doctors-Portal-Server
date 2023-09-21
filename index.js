@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 4000;
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 
@@ -54,6 +55,7 @@ async function run() {
         const bookingsCollection = client.db("doctors-portal").collection("Bookings");
         const usersCollection = client.db("doctors-portal").collection("users");
         const doctorsCollection = client.db("doctors-portal").collection("Doctors");
+        const paymentCollection = client.db("doctors-portal").collection("Payment");
 
 
 
@@ -203,6 +205,24 @@ async function run() {
         });
 
 
+        app.patch('/bookings/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = { _id: new ObjectId(id) }
+
+            const updateDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId
+                }
+            }
+
+            const result = await paymentCollection.insertOne(payment)
+            const updatedBooking = await bookingsCollection.updateOne(filter, updateDoc)
+            res.send(updatedBooking);
+        });
+
+
 
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
@@ -225,8 +245,9 @@ async function run() {
 
 
         /* ========================================================================================================== */
-        app.post('create-payment-intent', async (req, res) => {
+        app.post('/create-payment-intent', async (req, res) => {
             const service = req.body;
+            // console.log(service);
             const price = service.price;
             const amount = price * 100;
             const paymentIntent = await stripe.paymentIntents.create({
@@ -237,7 +258,7 @@ async function run() {
 
             res.send({ clientSecret: paymentIntent.client_secret });
         });
-        
+
     }
 
     finally {
