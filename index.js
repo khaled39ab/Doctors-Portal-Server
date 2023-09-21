@@ -203,12 +203,33 @@ async function run() {
             const booking = await bookingsCollection.findOne(query)
             res.send(booking)
         });
+        
 
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
 
+            const query = {
+                appointmentDate: booking.appointmentDate,
+                email: booking.email,
+                treatment: booking.treatment
+            }
+
+            const alreadyBooked = await bookingsCollection.findOne(query);
+            if (alreadyBooked) {
+                res.send({ success: false, booking: alreadyBooked })
+            }
+            
+            const result = bookingsCollection.insertOne(booking);
+            res.send({ success: true, result });
+        });
+        
+        
+        
         app.patch('/bookings/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
             const filter = { _id: new ObjectId(id) }
+            console.log(payment.transactionId);
 
             const updateDoc = {
                 $set: {
@@ -224,26 +245,14 @@ async function run() {
 
 
 
-        app.post('/bookings', async (req, res) => {
-            const booking = req.body;
+        
+        /* ========================================================================================================== */
+        app.get('/all-payment', async(req, res)=>{
+            const result = await paymentCollection.find().toArray();
+            res.send(result);
+        })
 
-            const query = {
-                appointmentDate: booking.appointmentDate,
-                email: booking.email,
-                treatment: booking.treatment
-            }
-
-            const alreadyBooked = await bookingsCollection.findOne(query);
-            if (alreadyBooked) {
-                res.send({ success: false, booking: alreadyBooked })
-            }
-
-            const result = bookingsCollection.insertOne(booking);
-            res.send({ success: true, result });
-        });
-
-
-
+        
         /* ========================================================================================================== */
         app.post('/create-payment-intent', async (req, res) => {
             const service = req.body;
