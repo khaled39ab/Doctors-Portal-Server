@@ -1,5 +1,5 @@
-const cors = require('cors');
 const express = require('express');
+const cors = require("cors");
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -8,9 +8,16 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
-
+const corsConfig = {
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  };
+  
+  app.use(cors(corsConfig));
+  app.options(cors(corsConfig));
 
 
 const uri = `mongodb+srv://${process.env.DOC_user}:${process.env.DOC_password}@cluster0.f1kxzik.mongodb.net/?retryWrites=true&w=majority`;
@@ -229,7 +236,7 @@ async function run() {
             const id = req.params.id;
             const payment = req.body;
             const filter = { _id: new ObjectId(id) }
-            console.log(payment.transactionId);
+            // console.log(payment.transactionId);
 
             const updateDoc = {
                 $set: {
